@@ -2,12 +2,14 @@
   <div class="max-w-5xl mx-auto pt-14">
     <div class="max-w-xl" :class="{ 'pointer-events-none': isLoading }">
       <h1 class="text-2xl font-semibold mb-10">Create campaign</h1>
+      <Alert v-if="errorMessage" :message="errorMessage" />
       <form @submit.prevent="submit">
         <label class="label">
           <span class="label-text">Campaign name</span>
         </label>
         <input
           type="text"
+          required
           v-model="form.name"
           placeholder="(Ex. may discount)"
           class="input input-bordered w-full"
@@ -16,12 +18,12 @@
         <label class="label">
           <span class="label-text">Event</span>
         </label>
-        <input v-model="form.event" type="text" class="input input-bordered w-full" />
+        <input v-model="form.event" required type="text" class="input input-bordered w-full" />
 
         <label class="label">
           <span class="label-text">Type</span>
         </label>
-        <select v-model="form.type" class="select select-bordered font-normal">
+        <select required v-model="form.type" class="select select-bordered font-normal">
           <option disabled selected>Pick one</option>
           <option>Cashback</option>
           <option>Discount</option>
@@ -124,7 +126,15 @@ const mapFields = computed(() => {
 })
 
 const isLoading = ref(false)
+const errorMessage = ref('')
 async function submit() {
+  if (!form.value.products.length) {
+    errorMessage.value = 'please select at least 1 product'
+    setTimeout(() => {
+      errorMessage.value = ''
+    }, 3000)
+    return
+  }
   try {
     isLoading.value = true
     const { data } = await axios.post(manageUrl, mapFields.value, {
@@ -136,7 +146,10 @@ async function submit() {
     })
     await publish(data.sys.id)
   } catch (e) {
-    console.log(e)
+    errorMessage.value = 'something went wrong'
+    setTimeout(() => {
+      errorMessage.value = ''
+    }, 3000)
   } finally {
     isLoading.value = false
   }
