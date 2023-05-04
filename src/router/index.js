@@ -10,8 +10,13 @@ const router = createRouter({
     },
     {
       path: '/form',
-      name: 'from',
-      component: () => import('@/views/ProductForm.vue')
+      name: 'form',
+      component: () => import('@/views/CampaignForm.vue')
+    },
+    {
+      path: '/detail/:id',
+      name: 'detail',
+      component: () => import('@/views/CampaignDetail.vue')
     }
   ]
 })

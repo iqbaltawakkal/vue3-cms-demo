@@ -5,10 +5,21 @@
     @click="$emit('update:modelValue', false)"
   >
     <div class="modal-box rounded-[10px]">
-      <p>list of products</p>
-      <p v-for="item in items" :key="item">
-        {{ item }}
-      </p>
+      <p class="font-semibold text-lg mb-4">{{ items.length }} Product(s)</p>
+
+      <div v-for="item in items" class="border-b py-4" :key="item">
+        <div class="flex gap-6 items-center">
+          <div class="avatar">
+            <div class="w-16 rounded-full">
+              <img :src="item.picture.url" />
+            </div>
+          </div>
+          <div>
+            <p>{{ item.name }}</p>
+            <p class="text-sm text-gray-600">Available</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -29,12 +29,16 @@
             </a>
           </td>
           <td class="text-right">
-            <div class="tooltip tooltip-left mr-4 cursor-pointer" data-tip="view"><IconEye /></div>
+            <div class="tooltip tooltip-left mr-4 cursor-pointer" data-tip="view">
+              <router-link :to="`/detail/${item.sys.id}`"><IconEye /></router-link>
+            </div>
           </td>
         </tr>
       </tbody>
-      <Spinner v-if="isLoading" />
     </table>
+    <div class="flex justify-center mt-12" v-if="isLoading">
+      <Spinner additionalClass="text-black w-12 h-12" />
+    </div>
   </div>
   <ModalProduct v-model="isModalProduct" />
 </template>
