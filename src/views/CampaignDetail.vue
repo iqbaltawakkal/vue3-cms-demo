@@ -41,8 +41,10 @@
         </div>
       </div>
     </div>
-    <div class="text-right mt-10">
-      <button class="btn btn-ghost"><router-link to="/">back</router-link></button>
+    <div v-if="!isLoading" class="text-right mt-10">
+      <button class="btn btn-ghost">
+        <router-link to="/">back</router-link>
+      </button>
     </div>
   </div>
 </template>

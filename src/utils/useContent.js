@@ -28,6 +28,21 @@ export default function () {
     }
   }`
 
+  const queryAllProduct = `query productCollectionQuery {
+    productCollection {
+      items {
+        sys {
+          id
+        }
+        name
+        picture {
+          url
+        }
+      }
+    }
+  }
+  `
+
   function queryCampaign(id) {
     return `query campaignEntryQuery {
         campaign(id: "${id}") {
@@ -57,6 +72,7 @@ export default function () {
     manageUrl,
     queryAllCampaign,
     queryCampaign,
-    manageApiKey
+    manageApiKey,
+    queryAllProduct
   }
 }

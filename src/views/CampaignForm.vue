@@ -43,6 +43,25 @@
           class="input input-bordered w-full uppercase placeholder:normal-case"
         />
 
+        <label class="label">
+          <span class="label-text">Products</span>
+        </label>
+
+        <label
+          v-for="product in products"
+          :key="product.sys.id"
+          class="flex items-center gap-4 mb-4"
+        >
+          <input
+            v-model="form.products"
+            :value="product.sys.id"
+            type="checkbox"
+            checked="checked"
+            class="checkbox checkbox-sm"
+          />
+          <span class="label-text">{{ product.name }}</span>
+        </label>
+
         <div class="flex gap-2 mt-16 items-center justify-end">
           <button @click="$router.push('/')" class="btn btn-ghost normal-case">Cancel</button>
           <button type="submit" class="btn normal-case text-white">
@@ -58,10 +77,10 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import useContent from '@/utils/useContent'
 
-const { manageUrl, manageApiKey } = useContent()
+const { manageUrl, manageApiKey, queryAllProduct, contentUrl } = useContent()
 const form = ref({
   name: '',
   type: '',
@@ -71,57 +90,50 @@ const form = ref({
   products: []
 })
 
+const mapFields = computed(() => {
+  return {
+    fields: {
+      name: {
+        'en-US': form.value.name
+      },
+      event: {
+        'en-US': form.value.event
+      },
+      type: {
+        'en-US': form.value.type
+      },
+      action: {
+        'en-US': form.value.action
+      },
+      coupon: {
+        'en-US': form.value.coupon
+      },
+      products: {
+        'en-US': form.value.products.map((e) => {
+          return {
+            sys: {
+              type: 'Link',
+              linkType: 'Entry',
+              id: e
+            }
+          }
+        })
+      }
+    }
+  }
+})
+
 const isLoading = ref(false)
 async function submit() {
   try {
     isLoading.value = true
-    const { data } = await axios.post(
-      manageUrl,
-      {
-        fields: {
-          name: {
-            'en-US': 'campaign 11'
-          },
-          event: {
-            'en-US': 'discount 5'
-          },
-          type: {
-            'en-US': 'disco3unt'
-          },
-          action: {
-            'en-US': '-'
-          },
-          coupon: {
-            'en-US': '2314'
-          },
-          products: {
-            'en-US': [
-              {
-                sys: {
-                  type: 'Link',
-                  linkType: 'Entry',
-                  id: '67cQWZzChF5kL4J1vMfeAj'
-                }
-              },
-              {
-                sys: {
-                  type: 'Link',
-                  linkType: 'Entry',
-                  id: '5UL95pNWZbO82UFp2LKo5j'
-                }
-              }
-            ]
-          }
-        }
-      },
-      {
-        headers: {
-          'Content-Type': 'application/vnd.contentful.management.v1+json',
-          Authorization: `Bearer ${manageApiKey}`,
-          'X-Contentful-Content-Type': 'campaign'
-        }
+    const { data } = await axios.post(manageUrl, mapFields.value, {
+      headers: {
+        'Content-Type': 'application/vnd.contentful.management.v1+json',
+        Authorization: `Bearer ${manageApiKey}`,
+        'X-Contentful-Content-Type': 'campaign'
       }
-    )
+    })
     await publish(data.sys.id)
   } catch (e) {
     console.log(e)
@@ -149,4 +161,24 @@ async function publish(id) {
     router.push('/')
   }
 }
+
+const products = ref([])
+async function fetchProducts() {
+  try {
+    isLoading.value = true
+    const { data } = await axios.post(contentUrl, {
+      query: queryAllProduct
+    })
+
+    products.value = data.data.productCollection.items
+  } catch (e) {
+    console.log(e)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchProducts()
+})
 </script>
